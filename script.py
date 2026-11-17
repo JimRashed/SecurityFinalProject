@@ -1,21 +1,29 @@
 # This is a sample Python script.
-from scapy.sendrecv import sniff
-
-
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from scapy.all import *
+import socket
 
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
 
+def ResolveDestinationHostNames(packets):
+     for packet in packets:
+             destination = ""
+             error = None
+             try:        
+                 destination = socket.gethostbyaddr(packet[IP].dst);
+             except socket.herror as e:
+                      error = (e)
+             finally:
+                   if (error):
+                         print(f"Error: {error} (probably private)")
+                   else:
+                         print(f"Destination IP: {destination[2]} - DNS Lookup result: {destination[0]}");
 
-# Press the green button in the gutter to run the script.
+
 if __name__ == '__main__':
     print_hi('PyCharm')
-    packets = sniff()
-    for packet in packets:
-        print(packet)
+    packets = sniff(filter="tcp", count = 100, iface = "Ethernet")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    ResolveDestinationHostNames(packets)
